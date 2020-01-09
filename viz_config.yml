@@ -1,18 +1,18 @@
 dates:
-  start: '2019-05-20 00:00:00'
-  end: '2019-05-27 00:00:00'
-timestep: 24 # in hours
+  start: '2019-10-25 00:00:00'
+  end: '2019-11-05 00:00:00'
+timestep: 12 # in hours
 
 # Arkansas River near Haskell, OK
 # Using pkq_site.rds file from https://github.com/USGS-VIZLAB/vizstorm-GIF/blob/OklahomaFloods-2019/1_fetch/out/
-# Plus cross-checking with NWS forecast table: https://www.nws.noaa.gov/oh/hads/USGS/OK_USGS-HADS_SITES.txt
-nws_site: "HSKO2"
-nwis_site: "07165570"
+# Plus cross-checking with NWS forecast table: nws.noaa.gov/oh/hads/USGS/[STATE ABBR]_USGS-HADS_SITES.txt
+nws_site: "MTGN4"
+nwis_site: "01438500"
 
 # Should create more elegant way to get min/max stage in the future
 stage:
   min: 0
-  max: 25
+  max: 15
 
 # animation options
 animation:
