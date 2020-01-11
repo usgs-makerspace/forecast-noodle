@@ -45,9 +45,9 @@ forecast_data <- models_in_window %>%
   tidyr::gather(key = forecast_name, value = stage, -dateTime) %>% 
   #arrange(forecast_name, dateTime) %>% 
   arrange(dateTime, forecast_name) %>% 
-  group_by(dateTime) %>% # So that the values are only getting filled by the previous forecasted
-  tidyr::fill(stage, .direction = "down") %>%
-  ungroup() %>%
+  # group_by(dateTime) %>% # So that the values are only getting filled by the previous forecasted
+  # tidyr::fill(stage, .direction = "down") %>%
+  # ungroup() %>%
   tidyr::spread(key = forecast_name, value = stage) 
   
 # x <- data.frame(t(apply(models_in_window[-1], 1, zoo::na.locf)))
