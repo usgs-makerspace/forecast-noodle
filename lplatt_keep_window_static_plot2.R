@@ -102,7 +102,7 @@ for(t in 1:length(timesteps)) {
   initiate_plot(fn)
   lines(data_to_plot[["dateTime"]][1:t], data_to_plot[["Stage_Observed"]][1:t], 
         lwd = 4, col = "#ff150c", lty = "dotted")
-  title("Observed river height")
+  title("Observed river height", cex.main = 2)
   complete_plot(fn)
 }
 
@@ -129,6 +129,15 @@ for(fc_count in 1:length(forecasts_to_plot)) {
   for(ts in 0:length(timesteps)) {
     
     if(ts != 0) {
+      fc_polygon_data_ONLY_ts <- fc_polygon_data %>% 
+        filter(dateTime == timesteps[ts])
+      if(nrow(fc_polygon_data_ONLY_ts) == 0) {
+        # skipping frame if the forecast doesn't have a point
+        # for this timestep so that the animation can move along
+        message(sprintf("Skipped %s", timesteps[ts])) 
+        next
+      } 
+      
       fc_polygon_data_ts <- fc_polygon_data %>% 
         filter(dateTime <= timesteps[ts])
       x_vals <- c(fc_polygon_data_ts$dateTime, rev(fc_polygon_data_ts$dateTime))
@@ -196,9 +205,9 @@ diagram_video <- "video_intro_diagram_draft.mp4"
 observed_video <- "video_observed_draft.mp4"
 forecast_video <- "video_forecast_draft.mp4"
 create_draft_ts_video(sprintf("6_visualize/%s", intro_video), frame_grp = "AA", sec_paused_on_frame = 5)
-create_draft_ts_video(sprintf("6_visualize/%s", diagram_video), frame_grp = "AB", sec_paused_on_frame = 7)
+create_draft_ts_video(sprintf("6_visualize/%s", diagram_video), frame_grp = "AB", sec_paused_on_frame = 8)
 create_draft_ts_video(sprintf("6_visualize/%s", observed_video), frame_grp = "B", sec_paused_on_frame = 0.15)
-create_draft_ts_video(sprintf("6_visualize/%s", forecast_video), frame_grp = "C", sec_paused_on_frame = 0.3)
+create_draft_ts_video(sprintf("6_visualize/%s", forecast_video), frame_grp = "C", sec_paused_on_frame = 0.4)
 
 # Concatenate videos with varying framerates
 writeLines(sprintf("file %s", c(intro_video, diagram_video, observed_video, forecast_video)), "6_visualize/videosToMerge.txt")
