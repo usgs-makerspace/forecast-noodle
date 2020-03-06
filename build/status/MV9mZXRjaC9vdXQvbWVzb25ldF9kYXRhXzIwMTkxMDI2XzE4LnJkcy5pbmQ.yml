@@ -1,0 +1,11 @@
+version: 0.3.0
+name: 1_fetch/out/mesonet_data_20191026_18.rds.ind
+type: file
+hash: 3e757215586c776000626af1bdb997db
+time: 2020-01-10 14:55:41 UTC
+depends: {}
+fixed: 67f9d635de8ad11f19b329950d1bd9d0
+code:
+  functions:
+    download_mesonet_data: 56850af73d129e9050c8a2053e9aa1d4
+
