@@ -1,5 +1,8 @@
 library(dplyr)
 
+# Create timelapse of the 6 hr forecasts and then the real data 
+# Requires that 1_fetch has been built
+# Also requires that `6_visualize_notpipelined/tmp_v1`` folder exists
 
 plot_type <- switch(Sys.info()[['sysname']],
                     Windows= "cairo",
@@ -106,7 +109,7 @@ for(i in 1:length(model_timesteps)) {
       #####
     
     # Set up frame to save
-    png_fn <- sprintf("6_visualize/tmp_test/frame_%s.png", format(timestep, "%Y%m%d_%H"))
+    png_fn <- sprintf("6_visualize_notpipelined/tmp_v1/frame_%s.png", format(timestep, "%Y%m%d_%H"))
     message(sprintf("Creating %s", png_fn))
     png(png_fn, height = 400, width = 800, type = plot_type)
     #if(t == structure(1558785600, class = c("POSIXct", "POSIXt"), tzone = "UTC")) browser()
@@ -180,30 +183,19 @@ for(i in 1:length(model_timesteps)) {
     
     dev.off()
     
-    
-  #browser()
   }
   
 }
 
-##### Create video NOT CURRENTLY WORKING
-out_file <- "video_test_montague_12hr.mp4"
-
-# Get list of frames that should be in this current build
-png_frames <- list.files('6_visualize/tmp_test', full.names = TRUE)
-
+##### Create video
+out_file <- "6_visualize_notpipelined/v1_forecast_noodle.mp4"
+png_frames <- list.files('6_visualize_notpipelined/tmp_v1', full.names = TRUE)
 file_name_df <- tibble(origName = png_frames,
                        countFormatted = dataRetrieval::zeroPad(1:length(png_frames), padTo = 3),
-                       newName = file.path("6_visualize/tmp_test", paste0("frame_", countFormatted, ".png")))
+                       newName = file.path("6_visualize_notpipelined/tmp_v1", paste0("frame_", countFormatted, ".png")))
 file.rename(from = file_name_df$origName, to = file_name_df$newName)
-
-# added ffmpeg better code for reducing video size
-# see https://unix.stackexchange.com/questions/28803/how-can-i-reduce-a-videos-size-with-ffmpeg
-# and https://slhck.info/video/2017/02/24/crf-guide.html
-
 shell_command <- sprintf(
-  "ffmpeg -y -framerate %s -i 6_visualize/tmp_test/frame_%%03d.png -r %s -pix_fmt yuv420p -vcodec libx264 -crf 27 %s",
+  "ffmpeg -y -framerate %s -i 6_visualize_notpipelined/tmp_v1/frame_%%03d.png -r %s -pix_fmt yuv420p -vcodec libx264 -crf 27 %s",
   8, 10, out_file)
 system(shell_command)
-
 file.rename(from = file_name_df$newName, to = file_name_df$origName)

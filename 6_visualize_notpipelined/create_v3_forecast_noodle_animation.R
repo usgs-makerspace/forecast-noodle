@@ -1,6 +1,14 @@
+##### Create animation where time window is static #####
+
+# Requires that `6_visualize_notpipelined/munge_data_for_static_window.R` has been run 
+# Also requires that `6_visualize_notpipelined/tmp_v3` folder exists
+# May need to run:
+# library(sysfonts)
+# sysfonts::font_add_google("abel")
+
 library(dplyr)
 
-data_to_plot <- readRDS("6_visualize/static_window_plot_ready_data.R")
+data_to_plot <- readRDS("6_visualize_notpipelined/data/static_window_plot_ready_data.rds")
 
 forecasts_to_plot <- sort(head(tail(colnames(data_to_plot), -1), -1), decreasing = TRUE)
 timesteps <- data_to_plot$dateTime
@@ -19,7 +27,7 @@ intro_frames <- function() {
                       Darwin = "quartz")
   
   # Frame 1 with text
-  png("6_visualize/tmp_test3/frame_AA_intro_1.png", height = 400, width = 800, type = plot_type)
+  png("6_visualize_notpipelined/tmp_v3/frame_AA_intro_1.png", height = 400, width = 800, type = plot_type)
   par(family = 'abel') # install font with sysfonts::font_add_google('Abel','abel')
   showtext::showtext_begin() # begin using google fonts
   plot(c(0,1), c(0,1), type = 'n', axes=FALSE, xlab="", ylab="")
@@ -29,7 +37,7 @@ intro_frames <- function() {
   dev.off()
   
   # Frame 2 with text
-  png("6_visualize/tmp_test3/frame_AA_intro_2.png", height = 400, width = 800, type = plot_type)
+  png("6_visualize_notpipelined/tmp_v3/frame_AA_intro_2.png", height = 400, width = 800, type = plot_type)
   par(family = 'abel') # install font with sysfonts::font_add_google('Abel','abel')
   showtext::showtext_begin() # begin using google fonts
   plot(c(0,1), c(0,1), type = 'n', axes=FALSE, xlab="", ylab="")
@@ -40,7 +48,7 @@ intro_frames <- function() {
   dev.off()
   
   # Frame 3 with text & graph of how to interpret
-  png("6_visualize/tmp_test3/frame_AB_intro_3.png", height = 400, width = 800, type = plot_type)
+  png("6_visualize_notpipelined/tmp_v3/frame_AB_intro_3.png", height = 400, width = 800, type = plot_type)
   par(family = 'abel') # install font with sysfonts::font_add_google('Abel','abel')
   showtext::showtext_begin() # begin using google fonts
   plot(c(0,1), c(0,1), type = 'n', axes=FALSE, xlab="", ylab="")
@@ -98,7 +106,7 @@ intro_frames()
 
 # Loop through each timestep to show progression of observed
 for(t in 1:length(timesteps)) {
-  fn <- sprintf("6_visualize/tmp_test3/frame_B_observed_%02d.png", t)
+  fn <- sprintf("6_visualize_notpipelined/tmp_v3/frame_B_observed_%02d.png", t)
   initiate_plot(fn)
   lines(data_to_plot[["dateTime"]][1:t], data_to_plot[["Stage_Observed"]][1:t], 
         lwd = 4, col = "#ff150c", lty = "dotted")
@@ -145,7 +153,7 @@ for(fc_count in 1:length(forecasts_to_plot)) {
     } 
     
     # Add discrete forecast points for this timestep & any previous
-    fn <- sprintf("6_visualize/tmp_test3/frame_C_forecast_%s_%02d.png", fc_val, ts)
+    fn <- sprintf("6_visualize_notpipelined/tmp_v3/frame_C_forecast_%s_%02d.png", fc_val, ts)
     
     initiate_plot(fn)
     if(fc > 1) {
@@ -168,7 +176,7 @@ for(fc_count in 1:length(forecasts_to_plot)) {
 
 ##### Create initial video #####
 create_draft_ts_video <- function(out_file, frame_grp = NULL, sec_paused_on_frame = 5, framerate_out = 15) {
-  png_frames_all <- list.files('6_visualize/tmp_test3', full.names = TRUE)
+  png_frames_all <- list.files('6_visualize_notpipelined/tmp_v3', full.names = TRUE)
   
   if(frame_grp == "C") {
     png_frames_forecast <- png_frames_all[grepl("_C_", png_frames_all)]
@@ -177,7 +185,7 @@ create_draft_ts_video <- function(out_file, frame_grp = NULL, sec_paused_on_fram
                                          stringsAsFactors = FALSE) %>% 
       rowwise() %>% 
       mutate(
-        fn_vals_only = gsub("6_visualize/tmp_test3/frame_C_forecast_","", fn),
+        fn_vals_only = gsub("6_visualize_notpipelined/tmp_v3/frame_C_forecast_","", fn),
         forecast = head(unlist(strsplit(fn_vals_only, "_")), 1),
         timestep_extension = tail(unlist(strsplit(fn_vals_only, "_")), 1),
         timestep = head(unlist(strsplit(timestep_extension, "[.]")), 1)) %>% 
@@ -191,26 +199,26 @@ create_draft_ts_video <- function(out_file, frame_grp = NULL, sec_paused_on_fram
   }
   file_name_df <- tibble(origName = png_frames,
                          countFormatted = dataRetrieval::zeroPad(1:length(png_frames), padTo = 3),
-                         newName = file.path("6_visualize/tmp_test3", paste0("frame_", countFormatted, ".png")))
+                         newName = file.path("6_visualize_notpipelined/tmp_v3", paste0("frame_", countFormatted, ".png")))
   file.rename(from = file_name_df$origName, to = file_name_df$newName)
   shell_command <- sprintf(
-    "ffmpeg -y -framerate %s -i 6_visualize/tmp_test3/frame_%%03d.png -r %s -pix_fmt yuv420p -vcodec libx264 -crf 27 %s",
+    "ffmpeg -y -framerate %s -i 6_visualize_notpipelined/tmp_v3/frame_%%03d.png -r %s -pix_fmt yuv420p -vcodec libx264 -crf 27 %s",
     1/sec_paused_on_frame, framerate_out, out_file)
   system(shell_command)
   file.rename(from = file_name_df$newName, to = file_name_df$origName)
 }
 
-intro_video <- "video_intro_draft.mp4"
-diagram_video <- "video_intro_diagram_draft.mp4"
-observed_video <- "video_observed_draft.mp4"
-forecast_video <- "video_forecast_draft.mp4"
-create_draft_ts_video(sprintf("6_visualize/%s", intro_video), frame_grp = "AA", sec_paused_on_frame = 5)
-create_draft_ts_video(sprintf("6_visualize/%s", diagram_video), frame_grp = "AB", sec_paused_on_frame = 8)
-create_draft_ts_video(sprintf("6_visualize/%s", observed_video), frame_grp = "B", sec_paused_on_frame = 0.15)
-create_draft_ts_video(sprintf("6_visualize/%s", forecast_video), frame_grp = "C", sec_paused_on_frame = 0.4)
+intro_video <- "v3_intro_draft.mp4"
+diagram_video <- "v3_intro_diagram_draft.mp4"
+observed_video <- "v3_observed_draft.mp4"
+forecast_video <- "v3_forecast_draft.mp4"
+create_draft_ts_video(sprintf("6_visualize_notpipelined/%s", intro_video), frame_grp = "AA", sec_paused_on_frame = 5)
+create_draft_ts_video(sprintf("6_visualize_notpipelined/%s", diagram_video), frame_grp = "AB", sec_paused_on_frame = 8)
+create_draft_ts_video(sprintf("6_visualize_notpipelined/%s", observed_video), frame_grp = "B", sec_paused_on_frame = 0.15)
+create_draft_ts_video(sprintf("6_visualize_notpipelined/%s", forecast_video), frame_grp = "C", sec_paused_on_frame = 0.4)
 
 # Concatenate videos with varying framerates
-writeLines(sprintf("file %s", c(intro_video, diagram_video, observed_video, forecast_video)), "6_visualize/videosToMerge.txt")
+writeLines(sprintf("file %s", c(intro_video, diagram_video, observed_video, forecast_video)), "6_visualize_notpipelined/v3_videosToMerge.txt")
 # Need to delete the file if you rerun. Couldn't get `-y` to work with this one ...
-system(sprintf('ffmpeg -f concat -i 6_visualize/videosToMerge.txt -c copy %s', "6_visualize/video_forecast_noodle.mp4"))
+system(sprintf('ffmpeg -f concat -i 6_visualize_notpipelined/v3_videosToMerge.txt -c copy %s', "6_visualize_notpipelined/v3_forecast_noodle.mp4"))
 

@@ -45,3 +45,7 @@ vignettes/*.pdf
 !*/out/*.ind
 .remake
 *_tasks.yml
+
+# Gitignore everything in the non-pipelined visualize folder except the scripts
+6_visualize_notpipelined/*
+!6_visualize_notpipelined/*.R

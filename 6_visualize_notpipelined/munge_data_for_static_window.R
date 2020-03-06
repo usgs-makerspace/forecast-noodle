@@ -3,6 +3,9 @@
 
 # https://mesonet.agron.iastate.edu/plotting/auto/plot/160/station:MTGN4::dt:2019-10-28%200000::var:primary::dpi:100.csv
 
+# Requires fetch part of pipeline to be built
+# Requires that `6_visualize_notpipelined/data` folder exists
+
 library(dplyr)
 
 time0 <- as.POSIXct("2019-11-01 07:30:00 UTC")
@@ -72,4 +75,4 @@ obs_hourly <- readRDS('1_fetch/out/nwis_data.rds') %>%
 
 data_to_plot <- left_join(forecast_data, obs_hourly, by = "dateTime")
 
-saveRDS(data_to_plot, "6_visualize/static_window_plot_ready_data.R")
+saveRDS(data_to_plot, "6_visualize_notpipelined/data/static_window_plot_ready_data.rds")

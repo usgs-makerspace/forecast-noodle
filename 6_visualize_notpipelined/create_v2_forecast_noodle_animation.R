@@ -1,4 +1,11 @@
-##### Plot things #####
+##### Create animation where time window is static #####
+
+# Requires that `6_visualize_notpipelined/munge_data_for_static_window.R` has been run 
+# Also requires that `6_visualize_notpipelined/tmp_v2` folder exists
+# May need to run:
+library(sysfonts)
+sysfonts::font_add_google("abel")
+
 
 library(dplyr)
 
@@ -7,12 +14,12 @@ plot_type <- switch(Sys.info()[['sysname']],
                     Linux  = "Xlib",
                     Darwin = "quartz")
 
-data_to_plot <- readRDS("6_visualize/static_window_plot_ready_data.R")
+data_to_plot <- readRDS("6_visualize_notpipelined/data/static_window_plot_ready_data.rds")
 
 # Create an intro frame
 
 # Frame 1 with text
-png("6_visualize/tmp_test2/frame_A1_intro.png", height = 400, width = 800, type = plot_type)
+png("6_visualize_notpipelined/tmp_v2/frame_A1_intro.png", height = 400, width = 800, type = plot_type)
 par(family = 'abel') # install font with sysfonts::font_add_google('Abel','abel')
 showtext::showtext_begin() # begin using google fonts
 plot(c(0,1), c(0,1), type = 'n', axes=FALSE, xlab="", ylab="")
@@ -22,7 +29,7 @@ showtext::showtext_end()
 dev.off()
 
 # Frame 2 with text
-png("6_visualize/tmp_test2/frame_A2_intro.png", height = 400, width = 800, type = plot_type)
+png("6_visualize_notpipelined/tmp_v2/frame_A2_intro.png", height = 400, width = 800, type = plot_type)
 par(family = 'abel') # install font with sysfonts::font_add_google('Abel','abel')
 showtext::showtext_begin() # begin using google fonts
 plot(c(0,1), c(0,1), type = 'n', axes=FALSE, xlab="", ylab="")
@@ -33,7 +40,7 @@ showtext::showtext_end()
 dev.off()
 
 # Frame 3 with text & graph of how to interpret
-png("6_visualize/tmp_test2/frame_A3_intro.png", height = 400, width = 800, type = plot_type)
+png("6_visualize_notpipelined/tmp_v2/frame_A3_intro.png", height = 400, width = 800, type = plot_type)
 par(family = 'abel') # install font with sysfonts::font_add_google('Abel','abel')
 showtext::showtext_begin() # begin using google fonts
 plot(c(0,1), c(0,1), type = 'n', axes=FALSE, xlab="", ylab="")
@@ -59,7 +66,7 @@ cols_to_plot <- sort(head(tail(colnames(data_to_plot), -1), -1), decreasing = TR
 
 for(i in cols_to_plot) {
   
-  png(sprintf("6_visualize/tmp_test2/frame_%s.png", i), height = 400, width = 800, type = plot_type)
+  png(sprintf("6_visualize_notpipelined/tmp_v2/frame_%s.png", i), height = 400, width = 800, type = plot_type)
   
   par(family = 'abel') # install font with sysfonts::font_add_google('Abel','abel')
   showtext::showtext_begin() # begin using google fonts
@@ -98,15 +105,15 @@ for(i in cols_to_plot) {
 }
 
 ##### Create initial video
-out_file <- "6_visualize/video_draft.mp4"
-png_frames_all <- list.files('6_visualize/tmp_test2', full.names = TRUE)
+out_file <- "6_visualize_notpipelined/v2_draft.mp4"
+png_frames_all <- list.files('6_visualize_notpipelined/tmp_v2', full.names = TRUE)
 png_frames <- c(png_frames_all[1:3], rev(png_frames_all[-1:-3])) # Reverse because it is reading in wrong order
 file_name_df <- tibble(origName = png_frames,
                        countFormatted = dataRetrieval::zeroPad(1:length(png_frames), padTo = 3),
-                       newName = file.path("6_visualize/tmp_test2", paste0("frame_", countFormatted, ".png")))
+                       newName = file.path("6_visualize_notpipelined/tmp_v2", paste0("frame_", countFormatted, ".png")))
 file.rename(from = file_name_df$origName, to = file_name_df$newName)
 shell_command <- sprintf(
-  "ffmpeg -y -framerate %s -i 6_visualize/tmp_test2/frame_%%03d.png -r %s -pix_fmt yuv420p -vcodec libx264 -crf 27 %s",
+  "ffmpeg -y -framerate %s -i 6_visualize_notpipelined/tmp_v2/frame_%%03d.png -r %s -pix_fmt yuv420p -vcodec libx264 -crf 27 %s",
   1/1.3, 15, out_file)
 system(shell_command)
 file.rename(from = file_name_df$newName, to = file_name_df$origName)
@@ -114,11 +121,11 @@ file.rename(from = file_name_df$newName, to = file_name_df$origName)
 # Now slow down intro by cutting, slowing down, then putting back together
 # Needs to be in specific format
 
-writeLines(sprintf("file %s", c("video_intro_slow.mp4", "video_diagram_slow.mp4", "video_main.mp4")), "6_visualize/videosToMerge.txt")
-system(sprintf("ffmpeg -ss 0 -i %s -c copy -t 1 %s", out_file, "6_visualize/video_intro.mp4"))
-system(sprintf("ffmpeg -ss 1 -i %s -c copy -t 3 %s", out_file, "6_visualize/video_diagram.mp4"))
-system(sprintf("ffmpeg -ss 4 -i %s -c copy -t 15 %s", out_file, "6_visualize/video_main.mp4"))
-system(sprintf('ffmpeg -i %s -filter:v "setpts=2.0*PTS" %s', "6_visualize/video_intro.mp4", "6_visualize/video_intro_slow.mp4"))
-system(sprintf('ffmpeg -i %s -filter:v "setpts=6.0*PTS" %s', "6_visualize/video_diagram.mp4", "6_visualize/video_diagram_slow.mp4"))
-system(sprintf('ffmpeg -f concat -i 6_visualize/videosToMerge.txt -c copy %s', "6_visualize/video_final.mp4"))
+writeLines(sprintf("file %s", c("v2_intro_slow.mp4", "v2_diagram_slow.mp4", "v2_main.mp4")), "6_visualize_notpipelined/v2_videosToMerge.txt")
+system(sprintf("ffmpeg -ss 0 -i %s -c copy -t 1 %s", out_file, "6_visualize_notpipelined/v2_intro.mp4"))
+system(sprintf("ffmpeg -ss 1 -i %s -c copy -t 3 %s", out_file, "6_visualize_notpipelined/v2_diagram.mp4"))
+system(sprintf("ffmpeg -ss 4 -i %s -c copy -t 15 %s", out_file, "6_visualize_notpipelined/v2_main.mp4"))
+system(sprintf('ffmpeg -i %s -filter:v "setpts=2.0*PTS" %s', "6_visualize_notpipelined/v2_intro.mp4", "6_visualize_notpipelined/v2_intro_slow.mp4"))
+system(sprintf('ffmpeg -i %s -filter:v "setpts=6.0*PTS" %s', "6_visualize_notpipelined/v2_diagram.mp4", "6_visualize_notpipelined/v2_diagram_slow.mp4"))
+system(sprintf('ffmpeg -f concat -i 6_visualize_notpipelined/v2_videosToMerge.txt -c copy %s', "6_visualize_notpipelined/v2_forecast_noodle.mp4"))
 
