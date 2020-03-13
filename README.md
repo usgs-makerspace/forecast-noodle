@@ -20,3 +20,19 @@ scmake()
 ```
 
 To update the parameters used to build this repo, update the information in `viz_config.yml`.
+
+## Shelved for now, but where could we go next?
+
+See final videos [here in GS-WMA-IIDD-Makerspace Sharepoint](https://doimspp.sharepoint.com/:f:/r/sites/gs-wma-iidd-makerspace/Shared%20Documents/1%20Non-Channel/3%20Idea%20Blitzes/2020%20January/gage_forecasts?csf=1&e=4tuBpp). 
+
+Feedback:
+
+[Jordan, Joe, Nicole, others] These are tricky concepts – you have the time series of reality but also the timeseries of when models were predicted and to what times those predictions apply. Jordan’s initial thought is he would have shown full forecasts rather than one point per valid time. Joe and Nicole find the current presentation more intuitive for a “real person” 
+
+[Jake] Hypothetical outcome plots might be useful – helps people understand what uncertainty means. Example of hypothetical outcome plot https://twitter.com/oecodynamics/status/1082226682164101122?s=20 
+
+[Sam] show how the forecasted peak changes through time; [Joe] focusing on the timing & magnitude 
+
+[Jeff] could show metrics for how well the predictions capture the timing or magnitude 
+
+If we want hourly forecast data, we will need to look at a different source. The AHPS forecasts only have 6 hour timesteps, so the forecasts we used were not downsampled or anything (https://water.weather.gov/ahps2/hydrograph.php?wfo=jan&gage=plam6). Jordan thinks that there is a CUAHSI archive of NWM output, and a data release of NWM output for Harvey sponsored by CUAHSI (potentially here: https://www.hydroshare.org/resource/2836494ee75e43a9bfb647b37260e461/).

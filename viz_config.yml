@@ -1,7 +1,7 @@
 dates:
-  start: '2019-10-25 00:00:00'
+  start: '2019-10-20 00:00:00'
   end: '2019-11-05 00:00:00'
-timestep: 12 # in hours
+timestep: 6 # in hours
 
 # Arkansas River near Haskell, OK
 # Using pkq_site.rds file from https://github.com/USGS-VIZLAB/vizstorm-GIF/blob/OklahomaFloods-2019/1_fetch/out/
